@@ -2107,12 +2107,7 @@ abstract class AcceptanceTestCase extends MinkWrapper
      */
     protected function _getShopUrl($aParams = array(), $sShopId = null)
     {
-        if ($sShopId && oxSHOPID != 'oxbaseshop') {
-            $aParams['shp'] = $sShopId;
-        } elseif (isSUBSHOP) {
-            $aParams['shp'] = oxSHOPID;
-        }
-
+        $aParams['shp'] = $sShopId ?: $this->getTestConfig()->getShopId();
         return shopURL . "index.php?" . http_build_query($aParams);
     }
 

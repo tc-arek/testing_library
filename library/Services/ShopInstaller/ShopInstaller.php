@@ -135,7 +135,7 @@ namespace OxidEsales\TestingLibrary\Services\ShopInstaller {
 
             $dbHandler->query('drop database `' . $dbHandler->getDbName() . '`');
             $dbHandler->query('create database `' . $dbHandler->getDbName() . '` collate ' . $dbHandler->getCharsetMode() . '_general_ci');
-            $dbHandler->import($this->getEditionPathProvider()->getDatabaseSqlDirectory() . "/database.sql", 'latin1');
+            $dbHandler->import(getShopBasePath() . "/Setup/Sql/database.sql", 'latin1');
         }
 
         /**
@@ -143,7 +143,11 @@ namespace OxidEsales\TestingLibrary\Services\ShopInstaller {
          */
         public function insertDemoData()
         {
-            $this->getDbHandler()->import($this->getEditionPathProvider()->getDatabaseSqlDirectory() . "/demodata.sql", 'latin1');
+            $this->getDbHandler()->import(getShopBasePath() . "/Setup/Sql/demodata.sql", 'latin1');
+            $editionSelector = new EditionSelector();
+            if ($editionSelector->getEdition() == 'EE') {
+                $this->getDbHandler()->import($this->getEditionPathProvider()->getDatabaseSqlDirectory() . "/demodata.sql", 'latin1');
+            }
         }
 
         /**
@@ -151,7 +155,7 @@ namespace OxidEsales\TestingLibrary\Services\ShopInstaller {
          */
         public function convertToInternational()
         {
-            $this->getDbHandler()->import($this->getEditionPathProvider()->getDatabaseSqlDirectory() . "/en.sql", 'latin1');
+            $this->getDbHandler()->import(getShopBasePath() . "/Setup/Sql/en.sql", 'latin1');
         }
 
         /**
@@ -310,7 +314,7 @@ namespace OxidEsales\TestingLibrary\Services\ShopInstaller {
          */
         private function getShopId()
         {
-            return $this->getServiceConfig()->getShopEdition() == 'EE' ? '1' : 'oxbaseshop';
+            return '1';
         }
 
         /**
@@ -323,7 +327,7 @@ namespace OxidEsales\TestingLibrary\Services\ShopInstaller {
         private function insertConfigValue($type, $name, $value)
         {
             $dbHandler = $this->getDbHandler();
-            $shopId = $this->getServiceConfig()->getShopEdition() == 'EE' ? 1 : "'oxbaseshop'";
+            $shopId = 1;
 
             $dbHandler->query("DELETE from oxconfig WHERE oxvarname = '$name';");
             $dbHandler->query("REPLACE INTO `oxconfig` (`OXID`, `OXSHOPID`, `OXMODULE`, `OXVARNAME`, `OXVARTYPE`, `OXVARVALUE`) VALUES

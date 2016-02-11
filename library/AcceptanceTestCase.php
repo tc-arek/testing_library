@@ -167,13 +167,19 @@ abstract class AcceptanceTestCase extends MinkWrapper
         }
 
         $sTestSuitePath = realpath($sTestSuitePath . '/testSql/');
-        $sFileName = $sTestSuitePath . '/demodata_' . SHOP_EDITION . '.sql';
-        if (file_exists($sFileName)) {
-            $this->importSql($sFileName);
-        }
 
-        if (SHOP_EDITION == 'EE' && isSUBSHOP && file_exists($sTestSuitePath . '/demodata_EE_mall.sql')) {
-            $this->importSql($sTestSuitePath . '/demodata_EE_mall.sql');
+        $fixtureFiles = [
+            $sTestSuitePath . '/demodata.sql',
+            $sTestSuitePath . '/demodata_'.SHOP_EDITION.'.sql',
+        ];
+        if (SHOP_EDITION == 'EE' && isSUBSHOP) {
+            $fixtureFiles[] = $sTestSuitePath . '/demodata_mall.sql';
+            $fixtureFiles[] = $sTestSuitePath . '/demodata_EE_mall.sql';
+        }
+        foreach ($fixtureFiles as $fixture) {
+            if (file_exists($fixture)) {
+                $this->importSql($fixture);
+            }
         }
     }
 

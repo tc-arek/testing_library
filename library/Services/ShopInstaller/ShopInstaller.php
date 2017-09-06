@@ -55,13 +55,6 @@ class ShopInstaller extends NoBootstrapNeededService
      */
     public function init($request)
     {
-        $testConfig = new TestConfig();
-        if ($testConfig->shouldGenerateUnifiedNamespaceClasses()) {
-            \OxidEsales\TestingLibrary\TestConfig::prepareUnifiedNamespaceClasses();
-        }
-
-        include_once $this->serviceConfig->getShopDirectory() . '/bootstrap.php';
-
         $this->shopConfig = \OxidEsales\Eshop\Core\Registry::get(\OxidEsales\Eshop\Core\ConfigFile::class);
         $this->dbHandler = new DatabaseHandler($this->shopConfig);
 

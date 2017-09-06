@@ -52,16 +52,16 @@ abstract class BootstrapBase
     {
         $testConfig = $this->getTestConfig();
 
-        if ($testConfig->shouldInstallShop()) {
-            $this->installShop();
-        }
-
         $this->prepareShop();
 
         $this->setGlobalConstants();
 
         if ($testConfig->shouldRestoreShopAfterTestsSuite()) {
             $this->registerResetDbAfterSuite();
+        }
+
+        if ($testConfig->shouldInstallShop()) {
+            $this->installShop();
         }
 
         /** @var \OxidEsales\Eshop\Core\Config $config */
@@ -90,6 +90,12 @@ abstract class BootstrapBase
     protected function prepareShop()
     {
         $testConfig = $this->getTestConfig();
+
+        if ($testConfig->shouldGenerateUnifiedNamespaceClasses()) {
+            \OxidEsales\TestingLibrary\TestConfig::prepareUnifiedNamespaceClasses();
+        }
+        $shopPath = $testConfig->getShopPath();
+        require_once $shopPath .'bootstrap.php';
 
         $tempDirectory = $testConfig->getTempDirectory();
         if ($tempDirectory && $tempDirectory != '/') {

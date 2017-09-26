@@ -350,6 +350,7 @@ abstract class AcceptanceTestCase extends MinkWrapper
             }
         }
         $this->checkForErrors();
+        return $this->getMinkSession()->getPage();
     }
 
     /**

@@ -142,24 +142,16 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetExceptionsReturnsExpectedValue($exceptionsToBeLogged)
     {
-        $exceptionHandler = new \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler();
-
         $expectedLevel = 'exception';
         $expectedType = \OxidEsales\Eshop\Core\Exception\StandardException::class;
         $expectedMessage = 'test message';
         $expectedCode = 1024;
-        $expectedFile = __FILE__;
-        $expectedLine = __LINE__ + 2;
-
-        $exception = new \OxidEsales\Eshop\Core\Exception\StandardException($expectedMessage, $expectedCode);
-        $formattedException = $exceptionHandler->getFormattedException($exception);
 
         $exceptionLogFileRessource = tmpfile();
-        $exceptionLogFile = stream_get_meta_data($exceptionLogFileRessource)['uri'];
 
-        for ($i = 0; $i < $exceptionsToBeLogged; $i++) {
-            file_put_contents($exceptionLogFile, $formattedException, FILE_APPEND);
-        }
+        list($formattedException, $expectedLine, $expectedFile) = $this->formException($expectedType, $expectedMessage, $expectedCode);
+
+        $exceptionLogFile = $this->writeExceptionToFile($exceptionLogFileRessource, $exceptionsToBeLogged, $formattedException);
 
         $exceptionLogFileHelper = new \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper($exceptionLogFile);
         $actualExceptions = $exceptionLogFileHelper->getExceptions();
@@ -174,5 +166,41 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($expectedLine, $actualExceptions['formatted_content'][$i]['line']);
             $this->assertEquals($expectedMessage, $actualExceptions['formatted_content'][$i]['message']);
         }
+    }
+
+    /**
+     * @param string $expectedMessage
+     * @param int    $expectedCode
+     *
+     * @return array[int, string]
+     */
+    private function formException($expectedType, $expectedMessage, $expectedCode)
+    {
+        $expectedFile = __FILE__;
+        $expectedLine = __LINE__ + 1;
+        $exception = new $expectedType($expectedMessage, $expectedCode);
+
+        $exceptionHandler = new \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler();
+        $formattedException = $exceptionHandler->getFormattedException($exception);
+
+        return array($formattedException, $expectedLine, $expectedFile);
+    }
+
+    /**
+     * @param resource $exceptionLogFileRessource
+     * @param int      $exceptionCount
+     * @param string   $formattedException
+     *
+     * @return resource
+     */
+    private function writeExceptionToFile($exceptionLogFileRessource, $exceptionCount, $formattedException)
+    {
+        $exceptionLogFile = stream_get_meta_data($exceptionLogFileRessource)['uri'];
+
+        for ($counter = 0; $counter < $exceptionCount; $counter++) {
+            file_put_contents($exceptionLogFile, $formattedException, FILE_APPEND);
+        }
+
+        return $exceptionLogFile;
     }
 }

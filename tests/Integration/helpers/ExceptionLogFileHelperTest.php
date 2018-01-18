@@ -8,6 +8,19 @@ namespace OxidEsales\TestingLibrary\Tests\Integration\helpers;
 
 class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
 {
+    public function dataProviderWrongConstructorParameters()
+    {
+        return [
+            [''],
+            [[]],
+            [new \StdClass()],
+            [false],
+            [true],
+            [1],
+            [0],
+        ];
+    }
+
     /**
      * @dataProvider dataProviderWrongConstructorParameters
      * @covers       \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::__construct
@@ -23,16 +36,17 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
         $exceptionLogFileHelper = new \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper($constructorParameters);
     }
 
-    public function dataProviderWrongConstructorParameters()
+    public function dataProviderExpectedContent()
     {
         return [
             [''],
-            [[]],
-            [new \StdClass()],
-            [false],
-            [true],
-            [1],
-            [0],
+            ['test'],
+            ['tèßt'],
+            ["
+            
+            test
+            
+            "]
         ];
     }
 
@@ -55,20 +69,6 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
         fclose($exceptionLogFileResource);
 
         $this->assertSame($expectedContent, $actualContent);
-    }
-
-    public function dataProviderExpectedContent()
-    {
-        return [
-            [''],
-            ['test'],
-            ['tèßt'],
-            ["
-            
-            test
-            
-            "]
-        ];
     }
 
     /**
@@ -125,6 +125,15 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($actualContent);
     }
 
+    public function dataProviderNumberOfExceptionsToBeLogged()
+    {
+        return [
+            [0],
+            [1],
+            [5],
+        ];
+    }
+
     /**
      * @dataProvider dataProviderNumberOfExceptionsToBeLogged
      * @covers       \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::getExceptions
@@ -165,14 +174,5 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($expectedLine, $actualExceptions['formatted_content'][$i]['line']);
             $this->assertEquals($expectedMessage, $actualExceptions['formatted_content'][$i]['message']);
         }
-    }
-
-    public function dataProviderNumberOfExceptionsToBeLogged()
-    {
-        return [
-            [0],
-            [1],
-            [5],
-        ];
     }
 }

@@ -41,7 +41,7 @@ class ExceptionLogFileHelper
      *
      * @throws \OxidEsales\Eshop\Core\Exception\StandardException
      */
-    public function clearExceptionLogFile()
+    public function clearExceptionFile()
     {
         if (!$filePointerResource = fopen($this->exceptionLogFile, 'w')) {
             throw new \OxidEsales\Eshop\Core\Exception\StandardException('File ' . $this->exceptionLogFile . ' could not be opened in write mode');
@@ -59,7 +59,7 @@ class ExceptionLogFileHelper
      *
      * @throws \OxidEsales\Eshop\Core\Exception\StandardException
      */
-    public function getParsedExceptions()
+    public function getExceptions()
     {
         $parsedExceptions = [];
 

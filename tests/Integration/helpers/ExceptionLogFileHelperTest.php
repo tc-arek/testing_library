@@ -38,7 +38,7 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider dataProviderExpectedContent
-     * @covers       \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::getParsedExceptions
+     * @covers       \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::getExceptions
      *
      * @throws \OxidEsales\Eshop\Core\Exception\StandardException
      */
@@ -50,7 +50,7 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
 
         $exceptionLogFileHelper = new \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper($exceptionLogFile);
 
-        $actualContent = $exceptionLogFileHelper->getParsedExceptions()['original_content'];
+        $actualContent = $exceptionLogFileHelper->getExceptions()['original_content'];
 
         fclose($exceptionLogFileResource);
 
@@ -72,7 +72,7 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::clearExceptionLogFile
+     * @covers \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::clearExceptionFile
      */
     public function testClearExceptionLogFileThrowsExceptionOnFileNotWritable()
     {
@@ -91,7 +91,7 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
         try {
             // We do not want the E_WARNING issued by file_get_contrents to break or test
             $originalErrorReportingLevel = error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED ^ E_WARNING);
-            $exceptionLogFileHelper->clearExceptionLogFile();
+            $exceptionLogFileHelper->clearExceptionFile();
         } catch (\OxidEsales\Eshop\Core\Exception\StandardException $actualException) {
             $actualExceptionMessage = $actualException->getMessage();
             $exceptionThrown = true;
@@ -105,7 +105,7 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::clearExceptionLogFile
+     * @covers \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::clearExceptionFile
      *
      * @throws \OxidEsales\Eshop\Core\Exception\StandardException
      */
@@ -116,9 +116,9 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
         $exceptionLogFile = stream_get_meta_data($exceptionLogFileRessource)['uri'];
 
         $exceptionLogFileHelper = new \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper($exceptionLogFile);
-        $exceptionLogFileHelper->clearExceptionLogFile();
+        $exceptionLogFileHelper->clearExceptionFile();
 
-        $actualContent = $exceptionLogFileHelper->getParsedExceptions()['original_content'];
+        $actualContent = $exceptionLogFileHelper->getExceptions()['original_content'];
 
         fclose($exceptionLogFileRessource);
 
@@ -127,11 +127,11 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider dataProviderNumberOfExceptionsToBeLogged
-     * @covers       \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::getParsedExceptions
+     * @covers       \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::getExceptions
      *
      * @throws \OxidEsales\Eshop\Core\Exception\StandardException
      */
-    public function testGetParsedExceptionsReturnsExpectedValue($exceptionsToBeLogged)
+    public function testGetExceptionsReturnsExpectedValue($exceptionsToBeLogged)
     {
         $exceptionHandler = new \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler();
 
@@ -153,17 +153,17 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
         }
 
         $exceptionLogFileHelper = new \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper($exceptionLogFile);
-        $actualParsedExceptions = $exceptionLogFileHelper->getParsedExceptions();
+        $actualExceptions = $exceptionLogFileHelper->getExceptions();
 
         fclose($exceptionLogFileRessource);
 
         for ($i = 0; $i < $exceptionsToBeLogged; $i++) {
-            $this->assertEquals($expectedLevel, $actualParsedExceptions[$i]['level']);
-            $this->assertEquals($expectedType, $actualParsedExceptions[$i]['type']);
-            $this->assertEquals($expectedCode, $actualParsedExceptions[$i]['code']);
-            $this->assertEquals($expectedFile, $actualParsedExceptions[$i]['file']);
-            $this->assertEquals($expectedLine, $actualParsedExceptions[$i]['line']);
-            $this->assertEquals($expectedMessage, $actualParsedExceptions[$i]['message']);
+            $this->assertEquals($expectedLevel, $actualExceptions[$i]['level']);
+            $this->assertEquals($expectedType, $actualExceptions[$i]['type']);
+            $this->assertEquals($expectedCode, $actualExceptions[$i]['code']);
+            $this->assertEquals($expectedFile, $actualExceptions[$i]['file']);
+            $this->assertEquals($expectedLine, $actualExceptions[$i]['line']);
+            $this->assertEquals($expectedMessage, $actualExceptions[$i]['message']);
         }
     }
 

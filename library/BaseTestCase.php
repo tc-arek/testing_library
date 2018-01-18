@@ -137,14 +137,14 @@ abstract class BaseTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function assertLoggedException($expectedExceptionClass, $expectedExceptionMessage = null)
     {
-        $parsedExceptions = $this->exceptionLogHelper->getParsedExceptions();
+        $parsedExceptions = $this->exceptionLogHelper->getExceptions();
 
         $actualExceptionCount = count($parsedExceptions);
         $actualExceptionClass = $parsedExceptions[0]['type'];
         $actualExceptionMessage = $parsedExceptions[0]['message'];
         $exceptionLogEntries = $parsedExceptions['original_content'];
 
-        $this->exceptionLogHelper->clearExceptionLogFile();
+        $this->exceptionLogHelper->clearExceptionFile();
 
         $this->assertSame(
             1,
@@ -175,7 +175,7 @@ abstract class BaseTestCase extends \PHPUnit_Framework_TestCase
     protected function failOnLoggedExceptions()
     {
         if ($exceptionLogEntries = $this->exceptionLogHelper->getExceptions()['original_content']) {
-            $this->exceptionLogHelper->clearExceptionLogFile();
+            $this->exceptionLogHelper->clearExceptionFile();
             $this->fail('Test failed with ' . OX_LOG_FILE . ' entry:' . PHP_EOL . PHP_EOL . $exceptionLogEntries);
         }
     }

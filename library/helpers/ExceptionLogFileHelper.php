@@ -73,40 +73,59 @@ class ExceptionLogFileHelper
             throw new \OxidEsales\Eshop\Core\Exception\StandardException('File ' . $this->exceptionLogFile . ' could not be read');
         }
 
+        $exceptions = $this->convertExceptionsToArray($exceptionLogLines);
+
+        foreach ($exceptions as $exception) {
+            $parsedExceptions[self::FORMATTED][] = $this->covertSingleExceptionToArray($exception);
+        }
+        $parsedExceptions[self::ORIGINAL] = $logFileContent;
+
+        return $parsedExceptions;
+    }
+
+    /**
+     * @param $exceptionLogLines
+     *
+     * @return array
+     */
+    protected function convertExceptionsToArray($exceptionLogLines)
+    {
         $exceptions = array_filter(
             $exceptionLogLines,
             function ($entry) {
                 return false !== strpos($entry, '[exception] [type ');
             }
         );
+        return $exceptions;
+    }
 
-        foreach ($exceptions as $exception) {
-            /**
-             * See \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler::getFormattedException
-             * for the current log file format.
-             *
-             */
-            $logEntryDetails = explode('[', $exception);
-            array_walk(
-                $logEntryDetails,
-                function (&$detail) {
-                    $detail = trim(str_replace(['type ', 'code ', 'file ', 'line ', 'message ',], '', $detail), '] ');
-                }
-            );
-            list(, $timestamp, $level, $type, $code, $file, $line, $message) = $logEntryDetails;
+    /**
+     * See \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler::getFormattedException
+     * for the current log file format.
+     *
+     * @param string $exception
+     *
+     * @return array
+     */
+    protected function covertSingleExceptionToArray($exception)
+    {
+        $logEntryDetails = explode('[', $exception);
+        array_walk(
+            $logEntryDetails,
+            function (&$detail) {
+                $detail = trim(str_replace(['type ', 'code ', 'file ', 'line ', 'message ',], '', $detail), '] ');
+            }
+        );
+        list(, $timestamp, $level, $type, $code, $file, $line, $message) = $logEntryDetails;
 
-            $parsedExceptions[self::FORMATTED][] = [
-                'timestamp' => $timestamp,
-                'level'     => $level,
-                'type'      => $type,
-                'code'      => $code,
-                'file'      => $file,
-                'line'      => $line,
-                'message'   => $message,
-            ];
-        }
-        $parsedExceptions[self::ORIGINAL] = $logFileContent;
-
-        return $parsedExceptions;
+        return [
+            'timestamp' => $timestamp,
+            'level'     => $level,
+            'type'      => $type,
+            'code'      => $code,
+            'file'      => $file,
+            'line'      => $line,
+            'message'   => $message,
+        ];
     }
 }

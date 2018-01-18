@@ -158,12 +158,12 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
         fclose($exceptionLogFileRessource);
 
         for ($i = 0; $i < $exceptionsToBeLogged; $i++) {
-            $this->assertEquals($expectedLevel, $actualExceptions[$i]['level']);
-            $this->assertEquals($expectedType, $actualExceptions[$i]['type']);
-            $this->assertEquals($expectedCode, $actualExceptions[$i]['code']);
-            $this->assertEquals($expectedFile, $actualExceptions[$i]['file']);
-            $this->assertEquals($expectedLine, $actualExceptions[$i]['line']);
-            $this->assertEquals($expectedMessage, $actualExceptions[$i]['message']);
+            $this->assertEquals($expectedLevel, $actualExceptions['formatted_content'][$i]['level']);
+            $this->assertEquals($expectedType, $actualExceptions['formatted_content'][$i]['type']);
+            $this->assertEquals($expectedCode, $actualExceptions['formatted_content'][$i]['code']);
+            $this->assertEquals($expectedFile, $actualExceptions['formatted_content'][$i]['file']);
+            $this->assertEquals($expectedLine, $actualExceptions['formatted_content'][$i]['line']);
+            $this->assertEquals($expectedMessage, $actualExceptions['formatted_content'][$i]['message']);
         }
     }
 

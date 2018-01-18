@@ -15,6 +15,10 @@ namespace OxidEsales\TestingLibrary\helpers;
  */
 class ExceptionLogFileHelper
 {
+    const ORIGINAL = 'original_content';
+
+    const FORMATTED = 'formatted_content';
+
     /**
      * @var The fully qualified path to the exception log file
      */
@@ -63,8 +67,19 @@ class ExceptionLogFileHelper
     {
         $parsedExceptions = [];
 
-        $exceptions = $this->getExceptionLinesFromLogFile();
         $logFileContent = file_get_contents($this->exceptionLogFile);
+        $exceptionLogLines = file($this->exceptionLogFile, FILE_IGNORE_NEW_LINES);
+        if (false === $exceptionLogLines || false === $logFileContent) {
+            throw new \OxidEsales\Eshop\Core\Exception\StandardException('File ' . $this->exceptionLogFile . ' could not be read');
+        }
+
+        $exceptions = array_filter(
+            $exceptionLogLines,
+            function ($entry) {
+                return false !== strpos($entry, '[exception] [type ');
+            }
+        );
+
         foreach ($exceptions as $exception) {
             /**
              * See \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler::getFormattedException
@@ -80,7 +95,7 @@ class ExceptionLogFileHelper
             );
             list(, $timestamp, $level, $type, $code, $file, $line, $message) = $logEntryDetails;
 
-            $parsedExceptions[] = [
+            $parsedExceptions[self::FORMATTED][] = [
                 'timestamp' => $timestamp,
                 'level'     => $level,
                 'type'      => $type,
@@ -90,32 +105,8 @@ class ExceptionLogFileHelper
                 'message'   => $message,
             ];
         }
-        $parsedExceptions['original_content'] = $logFileContent;
+        $parsedExceptions[self::ORIGINAL] = $logFileContent;
 
         return $parsedExceptions;
-    }
-
-    /**
-     * Return an array, which only contains the lines with information about the exception, not the whole stacktrace
-     *
-     * @return array
-     *
-     * @throws \OxidEsales\Eshop\Core\Exception\StandardException
-     */
-    protected function getExceptionLinesFromLogFile()
-    {
-        $exceptionLogLines = file($this->exceptionLogFile, FILE_IGNORE_NEW_LINES);
-        if (false === $exceptionLogLines) {
-            throw new \OxidEsales\Eshop\Core\Exception\StandardException('File ' . $this->exceptionLogFile . ' could not be read');
-        }
-
-        $exceptionEntries = array_filter(
-            $exceptionLogLines,
-            function ($entry) {
-                return false !== strpos($entry, '[exception] [type ');
-            }
-        );
-
-        return $exceptionEntries;
     }
 }

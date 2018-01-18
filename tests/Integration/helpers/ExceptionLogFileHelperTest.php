@@ -37,39 +37,12 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::getExceptionLogFileContent
-     */
-    public function testGetExceptionLogFileContentThrowsExpectedOnFileNotReadable()
-    {
-        $exceptionLogFile = './non_existent_file.log';
-        $expectedExceptionMessage = 'File ' . $exceptionLogFile . ' could not be read';
-
-        $exceptionLogFileHelper = new \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper($exceptionLogFile);
-
-        $actualExceptionMessage = '';
-        $exceptionThrown = false;
-        try {
-            // We do not want the E_WARNING issued by file_get_contrents to break our test
-            $originalErrorReportingLevel = error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED ^ E_WARNING);
-            $logFileContent = $exceptionLogFileHelper->getExceptionLogFileContent();
-        } catch (\OxidEsales\Eshop\Core\Exception\StandardException $actualException) {
-            $actualExceptionMessage = $actualException->getMessage();
-            $exceptionThrown = true;
-        } finally {
-            error_reporting($originalErrorReportingLevel);
-        }
-
-        $this->assertEquals($expectedExceptionMessage, $actualExceptionMessage);
-        $this->assertTrue($exceptionThrown);
-    }
-
-    /**
      * @dataProvider dataProviderExpectedContent
-     * @covers       \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::getExceptionLogFileContent
+     * @covers       \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper::getParsedExceptions
      *
      * @throws \OxidEsales\Eshop\Core\Exception\StandardException
      */
-    public function testGetExceptionLogFileContentReturnsExpectedContent($expectedContent)
+    public function testGetExceptionReturnsOriginalContent($expectedContent)
     {
         $exceptionLogFileResource = tmpfile();
         $exceptionLogFile = stream_get_meta_data($exceptionLogFileResource)['uri'];
@@ -77,7 +50,7 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
 
         $exceptionLogFileHelper = new \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper($exceptionLogFile);
 
-        $actualContent = $exceptionLogFileHelper->getExceptionLogFileContent();
+        $actualContent = $exceptionLogFileHelper->getParsedExceptions()['original_content'];
 
         fclose($exceptionLogFileResource);
 
@@ -145,7 +118,7 @@ class ExceptionLogFileHelperTest extends \PHPUnit_Framework_TestCase
         $exceptionLogFileHelper = new \OxidEsales\TestingLibrary\helpers\ExceptionLogFileHelper($exceptionLogFile);
         $exceptionLogFileHelper->clearExceptionLogFile();
 
-        $actualContent = $exceptionLogFileHelper->getExceptionLogFileContent();
+        $actualContent = $exceptionLogFileHelper->getParsedExceptions()['original_content'];
 
         fclose($exceptionLogFileRessource);
 

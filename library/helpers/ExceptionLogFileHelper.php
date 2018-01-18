@@ -36,23 +36,6 @@ class ExceptionLogFileHelper
     }
 
     /**
-     * Return the complete content of the exception log file as a string.
-     *
-     * @return string Content of the exception log file
-     *
-     * @throws \OxidEsales\Eshop\Core\Exception\StandardException if log file contend could not be read
-     */
-    public function getExceptionLogFileContent()
-    {
-        $logFileContent = file_get_contents($this->exceptionLogFile);
-        if (false === $logFileContent) {
-            throw new \OxidEsales\Eshop\Core\Exception\StandardException('File ' . $this->exceptionLogFile . ' could not be read');
-        }
-
-        return $logFileContent;
-    }
-
-    /**
      * Use this method in _justified_ cases to clear exception log, e.g. if you are testing  exceptions and their behavior.
      * Do _not_ use this method to silence exceptions, if you do not understand why they are thrown or if you are too lazy to fix the root cause.
      *
@@ -81,6 +64,7 @@ class ExceptionLogFileHelper
         $parsedExceptions = [];
 
         $exceptions = $this->getExceptionLinesFromLogFile();
+        $logFileContent = file_get_contents($this->exceptionLogFile);
         foreach ($exceptions as $exception) {
             /**
              * See \OxidEsales\EshopCommunity\Core\Exception\ExceptionHandler::getFormattedException
@@ -106,6 +90,7 @@ class ExceptionLogFileHelper
                 'message'   => $message,
             ];
         }
+        $parsedExceptions['original_content'] = $logFileContent;
 
         return $parsedExceptions;
     }

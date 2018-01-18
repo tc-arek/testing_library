@@ -142,7 +142,7 @@ abstract class BaseTestCase extends \PHPUnit_Framework_TestCase
         $actualExceptionCount = count($parsedExceptions);
         $actualExceptionClass = $parsedExceptions[0]['type'];
         $actualExceptionMessage = $parsedExceptions[0]['message'];
-        $exceptionLogEntries = $this->exceptionLogHelper->getExceptionLogFileContent();
+        $exceptionLogEntries = $parsedExceptions['original_content'];
 
         $this->exceptionLogHelper->clearExceptionLogFile();
 
@@ -174,7 +174,7 @@ abstract class BaseTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function failOnLoggedExceptions()
     {
-        if ($exceptionLogEntries = $this->exceptionLogHelper->getExceptionLogFileContent()) {
+        if ($exceptionLogEntries = $this->exceptionLogHelper->getExceptions()['original_content']) {
             $this->exceptionLogHelper->clearExceptionLogFile();
             $this->fail('Test failed with ' . OX_LOG_FILE . ' entry:' . PHP_EOL . PHP_EOL . $exceptionLogEntries);
         }

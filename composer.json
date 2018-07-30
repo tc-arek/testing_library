@@ -26,6 +26,7 @@
         "bin/reset-shop",
         "bin/runmetrics",
         "bin/runtests",
+        "bin/runtests-codeception",
         "bin/runtests-coverage",
         "bin/runtests-selenium"
     ],

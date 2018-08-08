@@ -745,7 +745,7 @@ abstract class AcceptanceTestCase extends MinkWrapper
     {
         $sFrame = $sFrame ? $sFrame : $this->getSelectedFrame();
 
-        if ($this->_aFramePaths[$sFrame]) {
+        if (isset($this->_aFramePaths[$sFrame])) {
             $aPath = explode("/", $this->_aFramePaths[$sFrame]);
             $sFrame = array_pop($aPath);
             $this->_selectFrameByPath($aPath);
